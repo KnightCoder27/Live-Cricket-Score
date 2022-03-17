@@ -45,13 +45,13 @@ def bowler(data,w):
 def bover(data):
     bat=[]
     for batsmen in data['supportInfo']['liveSummary']['batsmen']:
-        bat.append(batsmen['player']['battingName']+'     '+str(batsmen['runs'])+'('+str(batsmen['balls'])+')')
+        bat.append(batsmen['player']['longName']+'     '+str(batsmen['runs'])+'('+str(batsmen['balls'])+')')
     return bat
 
 def bwer(data):
     a=[]
     for bowler in data['supportInfo']['liveSummary']['bowlers']:
-        a.append(bowler['player']['battingName']+'          '+str(bowler['overs'])+'-'+str(bowler['maidens'])+'-'+str(bowler['conceded'])+'-'+str(bowler['wickets']))
+        a.append(bowler['player']['longName']+'          '+str(bowler['overs'])+'-'+str(bowler['maidens'])+'-'+str(bowler['conceded'])+'-'+str(bowler['wickets']))
     return a
 
 def over(data,w,c):
@@ -59,8 +59,19 @@ def over(data,w,c):
     bowlers=bwer(data)
     ever = int(c['oversActual']+1)
     eo = "End of an Over "+str(ever).strip(".6") + "\n" + "Score card"
-    output= eo + "\n"+ str(c['over']['team']['abbreviation'])+' - '+str(c['over']['totalRuns'])+'/'+ str(c['over']['totalWickets']) + ' \n' + str(c['over']['overRuns'])+' Runs & '+ str(c['over']['overWickets'])+' Wickets'+'\n'+'batting=> '+' || '.join(batters) +'\n'+ 'bowling=> '+' || '.join(bowlers)
+    while True:
+        try:
+            output= eo + "\n"+ str(c['over']['team']['abbreviation'])+' - '+str(c['over']['totalRuns'])+'/'+ str(c['over']['totalWickets']) + ' \n' + str(c['over']['overRuns'])+' Runs & '+ str(c['over']['overWickets'])+' Wickets'+'\n'+'batting=> '+' || '.join(batters) +'\n'+ 'bowling=> '+' || '.join(bowlers) 
+            print(output)
+        except TypeError:
+            print("HI")
+            time.sleep(5)
+            print("HELLO")
+        else: 
+            print(output)
+            break   
     return output
+        
            
 
 live = [[match['scribeId'], match['series']['objectId'], match['series']['longName'],match['teams'][0]['team']['longName'],match['teams'][1]['team']['longName']] for match in Data['matches'] if match['status'] == "Live" ]
@@ -126,7 +137,7 @@ async def echo(message: types.Message):
                         if com != None:
                             NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nRuns : " + str(batsmen(data,c)) + "\nCommentary: " + str(c['commentTextItems'][0]['html']).capitalize()
                             if dup == NCM:
-                                time.sleep(8)
+                                time.sleep(5)
                             else:              
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM 
@@ -134,12 +145,13 @@ async def echo(message: types.Message):
                         else:
                             NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nRuns : " + str(batsmen(data,c))
                             if dup == NCM:
-                                time.sleep(8)
+                                time.sleep(5)
                             else:              
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM 
 
                         if str(c['oversActual']).find('.6')!=-1:
+                            #time.sleep(5)
                             o = over(data,w,c)
                             if d == o:
                                 time.sleep(3)
@@ -154,7 +166,7 @@ async def echo(message: types.Message):
                             NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nWicket : " + bowler(data,w) + "\nCommentary: " + str(com[0]['html']).capitalize()
                             #NC = "Commentary: ",com[0]['html'] 
                             if dup == NCM:
-                                time.sleep(8)
+                                time.sleep(5)
                             else:              
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM                       
@@ -162,12 +174,13 @@ async def echo(message: types.Message):
                         else:
                             NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nWicket : " + bowler(data,w)
                             if dup == NCM:
-                                time.sleep(8)
+                                time.sleep(5)
                             else:              
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM 
                         
                         if str(c['oversActual']).find('.6')!=-1:
+                            #time.sleep(5)
                             o = over(data,w,c)
                             if d == o:
                                 time.sleep(3)
@@ -182,7 +195,7 @@ async def echo(message: types.Message):
                         if com!=None:
                             NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nRuns : " + str(a[2]) + "\nCommentary: " + str(c['commentTextItems'][0]['html']).capitalize()
                             if dup == NCM:
-                                time.sleep(8)
+                                time.sleep(5)
                             else:              
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM 
@@ -190,12 +203,13 @@ async def echo(message: types.Message):
                         else:
                             NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nRuns : " + str(a[2])
                             if dup == NCM:
-                                time.sleep(8)
+                                time.sleep(5)
                             else:              
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM 
 
                         if str(c['oversActual']).find('.6')!=-1:
+                            #time.sleep(5)
                             o = over(data,w,c)
                             if d == o:
                                 time.sleep(3)
