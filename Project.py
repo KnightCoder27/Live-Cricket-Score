@@ -21,6 +21,7 @@ def batsmen(data,c):
     
     bat = data['supportInfo']['liveSummary']['batsmen']
     name = bat[0]['player']['longName']
+    
     if c['isFour'] :
         score= "FOUR " + " From  " + str(name)
         #print(score)
@@ -41,11 +42,24 @@ def bowler(data,w):
     time.sleep(15)
     return wicket
 
-def over(data,w,c):
-    print("End of an Over "+str(c['overActual']).rstrip("."))
-    print("Score card")
-    output=str(c['over']['team']['longName'])+' - '+str(c['over']['totalRuns'])+'/'+ str(c['over']['totalWickets']) + ' \n ' + str(c['over']['overRuns'])+' Runs & '+ str(c['over']['overWickets'])+' Wickets'+'\n'+'batting=> '+' || '.join(batsmen) +'\n'+ 'bowling=> '+' || '.join(bowler)
+def bover(data):
+    bat=[]
+    for batsmen in data['supportInfo']['liveSummary']['batsmen']:
+        bat.append(batsmen['player']['battingName']+'     '+str(batsmen['runs'])+'('+str(batsmen['balls'])+')')
+    return bat
 
+def bwer(data):
+    a=[]
+    for bowler in data['supportInfo']['liveSummary']['bowlers']:
+        a.append(bowler['player']['battingName']+'          '+str(bowler['overs'])+'-'+str(bowler['maidens'])+'-'+str(bowler['conceded'])+'-'+str(bowler['wickets']))
+    return a
+
+def over(data,w,c):
+    batters=bover(data)
+    bowlers=bwer(data)
+    ever = int(c['oversActual']+1)
+    eo = "End of an Over "+str(ever).strip(".6") + "\n" + "Score card"
+    output= eo + "\n"+ str(c['over']['team']['abbreviation'])+' - '+str(c['over']['totalRuns'])+'/'+ str(c['over']['totalWickets']) + ' \n' + str(c['over']['overRuns'])+' Runs & '+ str(c['over']['overWickets'])+' Wickets'+'\n'+'batting=> '+' || '.join(batters) +'\n'+ 'bowling=> '+' || '.join(bowlers)
     return output
            
 
@@ -85,6 +99,7 @@ async def echo(message: types.Message):
             #vs = str(live[0][3]) + " VS " + str(live[0][4])
             await bot.send_message(-644768316,m)
             dup=""
+            d = ""
             while True:
                 url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/details?&seriesId={live[user_input-1][1]}&matchId={live[user_input-1][0]}&latest=true"
                 
@@ -102,16 +117,14 @@ async def echo(message: types.Message):
                 if c:
                     com= c['commentTextItems']
 
-                    if str((.6)) in str(c['oversActual']):
-                            o = over(data,c)
-                            await bot.send_message(-644768316,o)
+                    
                     
                     if s:
                         a = c['oversActual'],c['title'],c['totalRuns']
                         
                         #NC = "----------No Commentary Available----------"
                         if com != None:
-                            NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nRuns : " + str(batsmen(data,c)) + "\nCommentary: " + str(c['commentTextItems'][0]['html']).upper()
+                            NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nRuns : " + str(batsmen(data,c)) + "\nCommentary: " + str(c['commentTextItems'][0]['html']).capitalize()
                             if dup == NCM:
                                 time.sleep(8)
                             else:              
@@ -125,13 +138,20 @@ async def echo(message: types.Message):
                             else:              
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM 
-                        
+
+                        if str(c['oversActual']).find('.6')!=-1:
+                            o = over(data,w,c)
+                            if d == o:
+                                time.sleep(3)
+                            else:              
+                                await bot.send_message(-644768316,o)
+                                d = o 
 
                     elif w:
                         a = c['oversActual'],c['title'],c['totalRuns']
                         #NC = "----------No Commentary Available----------"
                         if com != None:
-                            NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nWicket : " + bowler(data,w) + "\nCommentary: " + str(com[0]['html']).upper()
+                            NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nWicket : " + bowler(data,w) + "\nCommentary: " + str(com[0]['html']).capitalize()
                             #NC = "Commentary: ",com[0]['html'] 
                             if dup == NCM:
                                 time.sleep(8)
@@ -147,12 +167,20 @@ async def echo(message: types.Message):
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM 
                         
+                        if str(c['oversActual']).find('.6')!=-1:
+                            o = over(data,w,c)
+                            if d == o:
+                                time.sleep(3)
+                            else:              
+                                await bot.send_message(-644768316,o)
+                                d = o 
+                            
 
                     else:
                         a = c['oversActual'],c['title'],c['totalRuns']
                         NC = "----------No Commentary Available----------"
                         if com!=None:
-                            NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nRuns : " + str(a[2]) + "\nCommentary: " + str(c['commentTextItems'][0]['html']).upper()
+                            NCM = "Over : " + str(a[0]) +"\nTitle : " + str(a[1]) +"\nRuns : " + str(a[2]) + "\nCommentary: " + str(c['commentTextItems'][0]['html']).capitalize()
                             if dup == NCM:
                                 time.sleep(8)
                             else:              
@@ -167,7 +195,13 @@ async def echo(message: types.Message):
                                 await bot.send_message(-644768316,NCM)
                                 dup = NCM 
 
-
+                        if str(c['oversActual']).find('.6')!=-1:
+                            o = over(data,w,c)
+                            if d == o:
+                                time.sleep(3)
+                            else:              
+                                await bot.send_message(-644768316,o)
+                                d = o 
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
